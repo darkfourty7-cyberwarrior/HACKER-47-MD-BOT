@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             color: #fff;
         }
         .container {
@@ -26,6 +26,7 @@
             padding: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
         }
         .status {
             font-size: 24px;
@@ -44,6 +45,33 @@
             text-align: center;
             letter-spacing: 2px;
             border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #4CAF50;
+            background-color: #222;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
         }
         .instructions {
             text-align: left;
@@ -112,11 +140,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        .stat-label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
         .stat-value {
             font-weight: bold;
             color: #4CAF50;
@@ -126,22 +149,21 @@
             background-color: rgba(255, 255, 255, 0.1);
             margin: 15px 0;
         }
-        .top-plugins {
-            margin-top: 15px;
-        }
-        .plugin-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="status">HACKER 47 Status</div>
         
-        <div id="loading-container">
-            <p>Starting HACKER 47... Please wait.</p>
+        <!-- Number Input Section -->
+        <div id="input-container">
+            <p style="text-align: center;">Enter your WhatsApp number to pair:</p>
+            <input type="text" id="phoneNumberInput" class="input-box" placeholder="e.g., 923359095714" />
+            <button class="btn" onclick="requestPairingCode()">Generate Pairing Code</button>
+        </div>
+
+        <div id="loading-container" class="hidden">
+            <p>Generating code... Please wait.</p>
             <div class="loading-spinner"></div>
         </div>
         
@@ -156,7 +178,7 @@
                     <li>Tap Menu or Settings and select Linked Devices</li>
                     <li>Tap on "Link a Device"</li>
                     <li>When prompted for a QR code, tap "Link with phone number instead"</li>
-                    <li>Enter the pairing code shown above</li>
+                    <li>Enter the pairing code shown above (Jaldi karein, 1 min mein expire hota hai)</li>
                 </ol>
             </div>
         </div>
@@ -167,144 +189,84 @@
             
             <div class="dashboard">
                 <div class="dashboard-title">🤖 HACKER 47 DASHBOARD 🤖</div>
-                
                 <div class="dashboard-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">👥 Users</span>
-                        <span id="user-count" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">📝 Registered</span>
-                        <span id="registered-users" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">👥 Groups</span>
-                        <span id="group-count" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">💬 Private Chats</span>
-                        <span id="chat-count" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🛡️ Banned Users</span>
-                        <span id="banned-users" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🟢 Active Groups</span>
-                        <span id="active-groups" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🔌 Plugins</span>
-                        <span id="plugin-count" class="stat-value">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">⏱️ Uptime</span>
-                        <span id="uptime" class="stat-value">-</span>
-                    </div>
-                </div>
-                
-                <div class="divider"></div>
-                
-                <div class="top-plugins">
-                    <div class="dashboard-title">🔝 Top Plugins</div>
-                    <div id="plugins-container">
-                        <div class="plugin-item">Loading plugin data...</div>
-                    </div>
+                    <div class="stat-item"><span class="stat-label">👥 Users</span><span id="user-count" class="stat-value">-</span></div>
+                    <div class="stat-item"><span class="stat-label">📝 Registered</span><span id="registered-users" class="stat-value">-</span></div>
+                    <div class="stat-item"><span class="stat-label">👥 Groups</span><span id="group-count" class="stat-value">-</span></div>
+                    <div class="stat-item"><span class="stat-label">💬 Private Chats</span><span id="chat-count" class="stat-value">-</span></div>
+                    <div class="stat-item"><span class="stat-label">🔌 Plugins</span><span id="plugin-count" class="stat-value">-</span></div>
+                    <div class="stat-item"><span class="stat-label">⏱️ Uptime</span><span id="uptime" class="stat-value">-</span></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Check for pairing status on page load and every 3 seconds
+        // Naya code generate karne ka function
+        function requestPairingCode() {
+            const number = document.getElementById('phoneNumberInput').value;
+            if (!number) {
+                alert("Please enter a valid phone number.");
+                return;
+            }
+
+            document.getElementById('input-container').classList.add('hidden');
+            document.getElementById('loading-container').classList.remove('hidden');
+
+            // Backend ko request bhej rahe hain code generate karne ke liye
+            fetch('/pair', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: number })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading-container').classList.add('hidden');
+                document.getElementById('pairing-container').classList.remove('hidden');
+                // Agar backend code bhejta hai toh dikhao, warna polling se aayega
+                if(data.code) {
+                    document.getElementById('pairing-code').textContent = data.code;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Server se connect nahi ho paya. Dobara koshish karein.");
+                document.getElementById('loading-container').classList.add('hidden');
+                document.getElementById('input-container').classList.remove('hidden');
+            });
+        }
+
         function checkStatus() {
             fetch('/pairing-status')
                 .then(response => response.json())
                 .then(data => {
-                    // Hide loading once we have data
-                    document.getElementById('loading-container').classList.add('hidden');
-                    
                     if (data.connected) {
-                        // If connected, show success message and dashboard
+                        document.getElementById('input-container').classList.add('hidden');
                         document.getElementById('pairing-container').classList.add('hidden');
+                        document.getElementById('loading-container').classList.add('hidden');
                         document.getElementById('success-container').classList.remove('hidden');
                         
-                        // If stats are available, update the dashboard
                         if (data.stats) {
                             updateDashboard(data.stats);
-                        } else {
-                            // If no stats yet, fetch them
-                            fetchAiStats();
                         }
-                    } else if (data.pairingCode) {
-                        // If pairing code available but not connected, show the code
-                        document.getElementById('pairing-container').classList.remove('hidden');
+                    } else if (data.pairingCode && document.getElementById('pairing-container').classList.contains('hidden') === false) {
                         document.getElementById('pairing-code').textContent = data.pairingCode;
                     }
                 })
-                .catch(error => {
-                    console.error('Error checking status:', error);
-                });
-        }
-        
-        // Fetch Ai statistics
-        function fetchAiStats() {
-            fetch('/bot-stats')
-                .then(response => response.json())
-                .then(data => {
-                    updateDashboard(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching stats:', error);
-                });
-        }
-        
-        // Update dashboard with statistics
-        function updateDashboard(stats) {
-            // Update user statistics
-            document.getElementById('user-count').textContent = stats.users || '-';
-            document.getElementById('registered-users').textContent = stats.registeredUsers || '-';
-            document.getElementById('banned-users').textContent = stats.bannedUsers || '-';
-            
-            // Update chat statistics
-            document.getElementById('group-count').textContent = stats.groups || '-';
-            document.getElementById('chat-count').textContent = stats.privateChats || '-';
-            document.getElementById('active-groups').textContent = stats.activeGroups || '-';
-            
-            // Update system info
-            document.getElementById('plugin-count').textContent = stats.plugins || '-';
-            document.getElementById('uptime').textContent = stats.uptime || '-';
-            
-            // Update top plugins
-            if (stats.topPlugins && stats.topPlugins.length > 0) {
-                const pluginsContainer = document.getElementById('plugins-container');
-                pluginsContainer.innerHTML = '';
-                
-                stats.topPlugins.forEach(plugin => {
-                    const pluginItem = document.createElement('div');
-                    pluginItem.className = 'plugin-item';
-                    pluginItem.innerHTML = `
-                        <span>${plugin.name.replace('.js', '')}</span>
-                        <span class="stat-value">${plugin.total}</span>
-                    `;
-                    pluginsContainer.appendChild(pluginItem);
-                });
-            } else {
-                document.getElementById('plugins-container').innerHTML = 
-                    '<div class="plugin-item">No plugin usage data available yet</div>';
-            }
+                .catch(error => console.error('Error:', error));
         }
 
-        // Check immediately and then every 3 seconds
-        checkStatus();
+        function updateDashboard(stats) {
+            document.getElementById('user-count').textContent = stats.users || '-';
+            document.getElementById('registered-users').textContent = stats.registeredUsers || '-';
+            document.getElementById('group-count').textContent = stats.groups || '-';
+            document.getElementById('chat-count').textContent = stats.privateChats || '-';
+            document.getElementById('plugin-count').textContent = stats.plugins || '-';
+            document.getElementById('uptime').textContent = stats.uptime || '-';
+        }
+
+        // Har 3 second baad check karega ke connect hua ya nahi
         setInterval(checkStatus, 3000);
-        
-        // Fetch updated stats every 30 seconds when connected
-        setInterval(() => {
-            if (!document.getElementById('success-container').classList.contains('hidden')) {
-                fetchAiStats();
-            }
-        }, 30000);
     </script>
 </body>
 </html>
